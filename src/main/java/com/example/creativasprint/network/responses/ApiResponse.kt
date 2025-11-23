@@ -1,4 +1,6 @@
 package com.example.creativasprint.network.responses
 
-class ApiResponse {
-}
+data class ApiResponse(
+    val success: Boolean,
+    val message: String
+)

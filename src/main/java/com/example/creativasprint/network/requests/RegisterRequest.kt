@@ -1,4 +1,8 @@
 package com.example.creativasprint.network.requests
 
-class RegisterRequest {
-}
+data class RegisterRequest(
+    val email: String,
+    val password: String,
+    val name: String,
+    val role: String = "client"
+)

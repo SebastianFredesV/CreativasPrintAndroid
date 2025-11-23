@@ -1,31 +1,15 @@
 package com.example.creativasprint.model
 
+import com.google.gson.annotations.SerializedName
+
 data class Product(
-    val id: String = "",
-    val nombre: String = "",
-    val precio: Double = 0.0,
-    val color: String = "",
-    val descripcion: String = "",
-    val imagen: String = "",
-    val categoria: String = "",
-    val images: List<String> = emptyList(),
-    val stock: Int = 0,
-    val isActive: Boolean = true
-) {
-    // Constructor para el JSON que tienes
-    constructor(
-        nombre: String,
-        precio: String,
-        color: String,
-        descripcion: String,
-        imagen: String
-    ) : this(
-        id = "",
-        nombre = nombre,
-        precio = precio.toDoubleOrNull() ?: 0.0,
-        color = color,
-        descripcion = descripcion,
-        imagen = imagen,
-        categoria = "General"
-    )
-}
+    @SerializedName("id") val id: String,
+    @SerializedName("nombre") val nombre: String,
+    @SerializedName("precio") val precio: Double,
+    @SerializedName("color") val color: String,
+    @SerializedName("descripcion") val descripcion: String,
+    @SerializedName("imagen") val imagen: String,
+    @SerializedName("categoria") val categoria: String,
+    @SerializedName("stock") val stock: Int = 0,
+    @SerializedName("is_active") val isActive: Boolean = true
+)

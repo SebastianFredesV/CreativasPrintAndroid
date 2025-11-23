@@ -28,8 +28,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.creativasprint.destinations.Destinations
-import com.example.creativasprint.model.User
-import kotlinx.coroutines.delay
+import com.example.creativasprint.network.ApiClient
+import com.example.creativasprint.network.requests.LoginRequest
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,49 +42,9 @@ fun LoginScreen(navController: NavController) {
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    var shouldLogin by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val sessionManager = SessionManager(context)
-
-    // LaunchedEffect para manejar el login de manera correcta
-    if (shouldLogin) {
-        LaunchedEffect(shouldLogin) {
-            if (shouldLogin) {
-                isLoading = true
-                errorMessage = null
-
-                delay(1500) // Simular llamada API
-
-                val user = when {
-                    email == "admin@creativasprint.com" && password == "admin123" -> {
-                        User("1", email, "Administrador", SessionManager.ROLE_ADMIN)
-                    }
-                    email == "cliente@creativasprint.com" && password == "cliente123" -> {
-                        User("2", email, "Cliente Demo", SessionManager.ROLE_CLIENT)
-                    }
-                    else -> null
-                }
-
-                isLoading = false
-                shouldLogin = false
-
-                if (user != null) {
-                    sessionManager.saveUserSession(user)
-                    val destination = if (user.role == SessionManager.ROLE_ADMIN) {
-                        Destinations.AdminMain.route
-                    } else {
-                        Destinations.ClientMain.route
-                    }
-                    navController.navigate(destination) {
-                        popUpTo(Destinations.Login.route) { inclusive = true }
-                    }
-                } else {
-                    errorMessage = "Credenciales incorrectas"
-                }
-            }
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -95,28 +59,40 @@ fun LoginScreen(navController: NavController) {
 
         TextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = {
+                email = it
+                errorMessage = null // Limpiar error cuando el usuario escriba
+            },
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            singleLine = true
+            singleLine = true,
+            isError = errorMessage != null
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         TextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = {
+                password = it
+                errorMessage = null // Limpiar error cuando el usuario escriba
+            },
             label = { Text("Contraseña") },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            singleLine = true
+            singleLine = true,
+            isError = errorMessage != null
         )
 
         errorMessage?.let {
             Spacer(modifier = Modifier.height(8.dp))
-            Text(it, color = androidx.compose.ui.graphics.Color.Red)
+            Text(
+                text = it,
+                color = androidx.compose.ui.graphics.Color.Red,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -127,12 +103,20 @@ fun LoginScreen(navController: NavController) {
             Button(
                 onClick = {
                     if (email.isNotEmpty() && password.isNotEmpty()) {
-                        shouldLogin = true
+                        performRealLogin(
+                            email = email,
+                            password = password,
+                            sessionManager = sessionManager,
+                            navController = navController,
+                            onLoading = { isLoading = it },
+                            onError = { errorMessage = it }
+                        )
                     } else {
                         errorMessage = "Completa todos los campos"
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isLoading
             ) {
                 Text("Iniciar Sesión")
             }
@@ -140,10 +124,74 @@ fun LoginScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextButton(onClick = {
-            navController.navigate(Destinations.Register.route)
-        }) {
+        TextButton(
+            onClick = {
+                navController.navigate(Destinations.Register.route)
+            },
+            enabled = !isLoading
+        ) {
             Text("¿No tienes cuenta? Regístrate")
+        }
+    }
+}
+
+// Función para realizar login real con la API
+private fun performRealLogin(
+    email: String,
+    password: String,
+    sessionManager: SessionManager,
+    navController: NavController,
+    onLoading: (Boolean) -> Unit,
+    onError: (String) -> Unit
+) {
+    onLoading(true)
+
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val loginRequest = LoginRequest(email, password)
+            val response = ApiClient.authService.login(loginRequest)
+
+            withContext(Dispatchers.Main) {
+                onLoading(false)
+
+                if (response.isSuccessful) {
+                    val authResponse = response.body()
+
+                    if (authResponse?.success == true && authResponse.user != null) {
+                        // ✅ Login exitoso - Guardar sesión
+                        sessionManager.saveUserSession(authResponse.user, authResponse.token)
+
+                        // Redirigir según el rol
+                        val destination = if (authResponse.user.role == SessionManager.ROLE_ADMIN) {
+                            Destinations.AdminMain.route
+                        } else {
+                            Destinations.ClientMain.route
+                        }
+
+                        navController.navigate(destination) {
+                            popUpTo(Destinations.Login.route) { inclusive = true }
+                        }
+                    } else {
+                        // ❌ Login fallido - Credenciales incorrectas
+                        onError(authResponse?.message ?: "Credenciales incorrectas")
+                    }
+                } else {
+                    // ❌ Error de servidor
+                    val errorMsg = when (response.code()) {
+                        401 -> "Credenciales incorrectas"
+                        404 -> "Usuario no encontrado"
+                        500 -> "Error del servidor"
+                        else -> "Error en el login: ${response.code()}"
+                    }
+                    onError(errorMsg)
+                }
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                onLoading(false)
+                // ❌ Error de conexión
+                onError("Error de conexión: ${e.message}")
+            }
         }
     }
 }

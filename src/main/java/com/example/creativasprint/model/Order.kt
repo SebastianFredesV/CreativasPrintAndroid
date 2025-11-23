@@ -1,17 +1,19 @@
 package com.example.creativasprint.model
 
+import com.google.gson.annotations.SerializedName
+
 data class Order(
-    val id: String = System.currentTimeMillis().toString(),
-    val userId: String = "",
-    val items: List<OrderItem> = emptyList(),
-    val total: Double = 0.0,
-    val status: String = "pending", // "pending", "accepted", "rejected", "shipped"
-    val createdAt: String = "",
-    val shippingAddress: String = "",
-    val customerName: String = "",
-    val customerEmail: String = "",
-    val customerPhone: String = "",
-    val shippingNotes: String = ""
+    @SerializedName("id") val id: String,
+    @SerializedName("user_id") val userId: String,
+    @SerializedName("items") val items: List<OrderItem>,
+    @SerializedName("total") val total: Double,
+    @SerializedName("status") val status: String,
+    @SerializedName("customer_name") val customerName: String,
+    @SerializedName("customer_email") val customerEmail: String,
+    @SerializedName("customer_phone") val customerPhone: String,
+    @SerializedName("shipping_address") val shippingAddress: String,
+    @SerializedName("shipping_notes") val shippingNotes: String = "",
+    @SerializedName("created_at") val createdAt: String
 ) {
     fun getStatusText(): String {
         return when (status) {

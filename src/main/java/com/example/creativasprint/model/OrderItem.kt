@@ -1,9 +1,10 @@
 package com.example.creativasprint.model
 
+import com.google.gson.annotations.SerializedName
+
 data class OrderItem(
-    val productId: String,
-    val productName: String,
-    val quantity: Int,
-    val price: Double,
-    val productImage: String = ""
+    @SerializedName("product_id") val productId: String,
+    @SerializedName("product_name") val productName: String,
+    @SerializedName("quantity") val quantity: Int,
+    @SerializedName("price") val price: Double
 )

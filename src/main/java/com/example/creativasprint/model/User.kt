@@ -1,11 +1,13 @@
 package com.example.creativasprint.model
 
+import com.google.gson.annotations.SerializedName
+
 data class User(
-    val id: String,
-    val email: String,
-    val name: String,
-    val role: String,
-    val isActive: Boolean = true,
-    val phone: String? = null,
-    val address: String? = null
+    @SerializedName("id") val id: String,
+    @SerializedName("email") val email: String,
+    @SerializedName("name") val name: String,
+    @SerializedName("role") val role: String,
+    @SerializedName("is_active") val isActive: Boolean = true,
+    @SerializedName("phone") val phone: String? = null,
+    @SerializedName("address") val address: String? = null
 )

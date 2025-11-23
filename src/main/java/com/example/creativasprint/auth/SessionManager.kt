@@ -3,46 +3,47 @@ package com.example.creativasprint.auth
 import android.content.Context
 import android.content.SharedPreferences
 import com.example.creativasprint.model.User
+import com.google.gson.Gson
 
 class SessionManager(private val context: Context) {
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("CreativasPrintPrefs", Context.MODE_PRIVATE)
+    private val gson = Gson()
 
     companion object {
-        const val KEY_USER_ID = "user_id"
-        const val KEY_EMAIL = "email"
-        const val KEY_NAME = "name"
-        const val KEY_ROLE = "role"
+        const val KEY_USER = "user_data"
         const val KEY_IS_LOGGED_IN = "is_logged_in"
+        const val KEY_AUTH_TOKEN = "auth_token"
+        // FALTAN ESTAS CONSTANTES:
         const val ROLE_ADMIN = "admin"
         const val ROLE_CLIENT = "client"
     }
 
-    fun saveUserSession(user: User) {
+    fun saveUserSession(user: User, token: String? = null) {
         with(sharedPreferences.edit()) {
-            putString(KEY_USER_ID, user.id)
-            putString(KEY_EMAIL, user.email)
-            putString(KEY_NAME, user.name)
-            putString(KEY_ROLE, user.role)
+            putString(KEY_USER, gson.toJson(user))
             putBoolean(KEY_IS_LOGGED_IN, true)
+            token?.let { putString(KEY_AUTH_TOKEN, it) }
             apply()
         }
     }
 
     fun getCurrentUser(): User? {
-        return if (isLoggedIn()) {
-            User(
-                id = sharedPreferences.getString(KEY_USER_ID, "") ?: "",
-                email = sharedPreferences.getString(KEY_EMAIL, "") ?: "",
-                name = sharedPreferences.getString(KEY_NAME, "") ?: "",
-                role = sharedPreferences.getString(KEY_ROLE, "") ?: ROLE_CLIENT
-            )
+        val userJson = sharedPreferences.getString(KEY_USER, null)
+        return if (userJson != null) {
+            gson.fromJson(userJson, User::class.java)
         } else {
             null
         }
     }
 
+    fun getAuthToken(): String? {
+        return sharedPreferences.getString(KEY_AUTH_TOKEN, null)
+    }
+
     fun isLoggedIn(): Boolean = sharedPreferences.getBoolean(KEY_IS_LOGGED_IN, false)
-    fun isAdmin(): Boolean = sharedPreferences.getString(KEY_ROLE, "") == ROLE_ADMIN
+
+    fun isAdmin(): Boolean = getCurrentUser()?.role == "admin"
+
     fun logout() = sharedPreferences.edit().clear().apply()
 }

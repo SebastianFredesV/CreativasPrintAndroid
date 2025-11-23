@@ -10,6 +10,7 @@ import com.google.gson.reflect.TypeToken
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 
 class OrderManager(private val context: Context) {
     private val sharedPreferences: SharedPreferences =
@@ -36,21 +37,24 @@ class OrderManager(private val context: Context) {
                 productName = cartItem.productName,
                 quantity = cartItem.quantity,
                 price = cartItem.productPrice
-                // Quitamos productImage ya que no está en el modelo OrderItem
             )
         }
 
+        // Generar un ID único temporal para la orden local
+        val temporaryOrderId = UUID.randomUUID().toString()
+
         return Order(
-            userId = "current_user",
+            id = temporaryOrderId,
+            userId = "current_user", // Esto se reemplazará con el ID real del usuario cuando se envíe a la API
             items = orderItems,
             total = total,
             status = "pending",
-            createdAt = dateFormat.format(Date()),
-            shippingAddress = shippingAddress,
             customerName = customerName,
             customerEmail = customerEmail,
             customerPhone = customerPhone,
-            shippingNotes = shippingNotes
+            shippingAddress = shippingAddress,
+            shippingNotes = shippingNotes,
+            createdAt = dateFormat.format(Date())
         )
     }
 
