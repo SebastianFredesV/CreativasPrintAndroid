@@ -12,6 +12,9 @@ import com.example.creativasprint.client.ClientMainScreen
 import com.example.creativasprint.client.products.ProductListScreen
 import com.example.creativasprint.destinations.Destinations
 import com.example.creativasprint.client.cart.CartScreen
+import com.example.creativasprint.client.checkout.CheckoutScreen
+import com.example.creativasprint.client.checkout.OrderConfirmationScreen
+import com.example.creativasprint.client.orders.OrderHistoryScreen
 
 @Composable
 fun NavGraph() {
@@ -36,13 +39,21 @@ fun NavGraph() {
         composable(Destinations.ClientMain.route) {
             ClientMainScreen(navController = navController)
         }
-        // Nuevas rutas para cliente
         composable(Destinations.ProductList.route) {
             ProductListScreen(navController = navController)
         }
         composable(Destinations.Cart.route) {
             CartScreen(navController = navController)
         }
-        // Agregaremos más rutas...
+        composable(Destinations.Checkout.route) {
+            CheckoutScreen(navController = navController)
+        }
+        composable("order_confirmation/{orderId}") { backStackEntry ->
+            val orderId = backStackEntry.arguments?.getString("orderId")
+            OrderConfirmationScreen(navController = navController, orderId = orderId)
+        }
+        composable(Destinations.OrderHistory.route) {
+            OrderHistoryScreen(navController = navController)
+        }
     }
 }
