@@ -2,11 +2,20 @@ package com.example.creativasprint.admin
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Inventory
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,7 +39,10 @@ fun AdminMainScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Panel de Administración")
+        Text(
+            "Panel de Administración",
+            style = MaterialTheme.typography.headlineMedium
+        )
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -38,32 +50,35 @@ fun AdminMainScreen(navController: NavController) {
             Text("Bienvenido, ${user.name}")
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
-        Text("Funciones disponibles:")
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = { /* TODO: Gestión de productos */ }
+        // Tarjetas de funcionalidades
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("Gestionar Productos")
-        }
+            // Gestión de Productos
+            AdminFeatureCard(
+                title = "Gestión de Productos",
+                description = "Crear, editar y eliminar productos del catálogo",
+                icon = Icons.Filled.Inventory,
+                onClick = { navController.navigate(Destinations.AdminProducts.route) }
+            )
 
-        Spacer(modifier = Modifier.height(8.dp))
+            // Gestión de Usuarios
+            AdminFeatureCard(
+                title = "Gestión de Usuarios",
+                description = "Administrar usuarios y permisos",
+                icon = Icons.Filled.People,
+                onClick = { navController.navigate(Destinations.AdminUsers.route) }
+            )
 
-        Button(
-            onClick = { /* TODO: Gestión de usuarios */ }
-        ) {
-            Text("Gestionar Usuarios")
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(
-            onClick = { /* TODO: Gestión de pedidos */ }
-        ) {
-            Text("Gestionar Pedidos")
+            // Gestión de Pedidos
+            AdminFeatureCard(
+                title = "Gestión de Pedidos",
+                description = "Revisar y gestionar pedidos de clientes",
+                icon = Icons.Filled.ShoppingCart,
+                onClick = { navController.navigate(Destinations.AdminOrders.route) }
+            )
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -77,6 +92,46 @@ fun AdminMainScreen(navController: NavController) {
             }
         ) {
             Text("Cerrar Sesión")
+        }
+    }
+}
+
+@Composable
+fun AdminFeatureCard(
+    title: String,
+    description: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                modifier = Modifier.padding(end = 16.dp)
+            )
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                )
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
     }
 }

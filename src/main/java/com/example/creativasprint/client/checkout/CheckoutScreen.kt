@@ -1,5 +1,6 @@
 package com.example.creativasprint.client.checkout
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -48,6 +49,7 @@ fun CheckoutScreen(navController: NavController) {
     var total by remember { mutableStateOf(0.0) }
     var isLoading by remember { mutableStateOf(false) }
     var shouldProcessOrder by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     // Datos del formulario
     var customerName by remember { mutableStateOf("") }
@@ -56,36 +58,77 @@ fun CheckoutScreen(navController: NavController) {
     var shippingAddress by remember { mutableStateOf("") }
     var shippingNotes by remember { mutableStateOf("") }
 
+    // Datos de prueba para desarrollo (quitar en producción)
     LaunchedEffect(Unit) {
+        customerName = "Cliente Ejemplo"
+        customerEmail = "cliente@ejemplo.com"
+        customerPhone = "123456789"
+        shippingAddress = "Calle Falsa 123"
+
         cartItems = cartManager.getCartItems()
         total = cartManager.getCartTotal()
+        Log.d("CheckoutDebug", "Cart items loaded: ${cartItems.size}, Total: $total")
     }
 
     // LaunchedEffect para procesar el pedido
     if (shouldProcessOrder) {
         LaunchedEffect(shouldProcessOrder) {
             if (shouldProcessOrder) {
-                isLoading = true
-                delay(2000) // Simular proceso de pago
+                try {
+                    Log.d("CheckoutDebug", "Starting order processing...")
+                    isLoading = true
+                    errorMessage = null
 
-                val order = orderManager.createOrderFromCart(
-                    cartItems = cartItems,
-                    total = total,
-                    customerName = customerName,
-                    customerEmail = customerEmail,
-                    customerPhone = customerPhone,
-                    shippingAddress = shippingAddress,
-                    shippingNotes = shippingNotes
-                )
+                    // Validar datos antes de procesar
+                    if (!validateForm(customerName, customerEmail, customerPhone, shippingAddress)) {
+                        errorMessage = "Por favor completa todos los campos correctamente"
+                        isLoading = false
+                        shouldProcessOrder = false
+                        return@LaunchedEffect
+                    }
 
-                orderManager.saveOrder(order)
-                cartManager.clearCart()
-                isLoading = false
-                shouldProcessOrder = false
+                    if (cartItems.isEmpty()) {
+                        errorMessage = "El carrito está vacío"
+                        isLoading = false
+                        shouldProcessOrder = false
+                        return@LaunchedEffect
+                    }
 
-                // Navegar a confirmación
-                navController.navigate("order_confirmation/${order.id}") {
-                    popUpTo("checkout") { inclusive = true }
+                    Log.d("CheckoutDebug", "Creating order...")
+                    delay(2000) // Simular proceso de pago
+
+                    val order = orderManager.createOrderFromCart(
+                        cartItems = cartItems,
+                        total = total,
+                        customerName = customerName,
+                        customerEmail = customerEmail,
+                        customerPhone = customerPhone,
+                        shippingAddress = shippingAddress,
+                        shippingNotes = shippingNotes
+                    )
+
+                    Log.d("CheckoutDebug", "Order created: ${order.id}")
+
+                    orderManager.saveOrder(order)
+                    Log.d("CheckoutDebug", "Order saved successfully")
+
+                    cartManager.clearCart()
+                    Log.d("CheckoutDebug", "Cart cleared")
+
+                    isLoading = false
+                    shouldProcessOrder = false
+
+                    // Navegar a confirmación
+                    Log.d("CheckoutDebug", "Navigating to confirmation...")
+                    navController.navigate("order_confirmation/${order.id}") {
+                        popUpTo("checkout") { inclusive = true }
+                    }
+
+                } catch (e: Exception) {
+                    Log.e("CheckoutDebug", "Error processing order: ${e.message}", e)
+                    errorMessage = "Error al procesar el pedido: ${e.message}"
+                    isLoading = false
+                    shouldProcessOrder = false
                 }
             }
         }
@@ -106,8 +149,28 @@ fun CheckoutScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Mostrar mensaje de error
+            errorMessage?.let { message ->
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = message,
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
             if (cartItems.isEmpty()) {
-                Text("Tu carrito está vacío")
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text("Tu carrito está vacío")
+                }
             } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -137,8 +200,11 @@ fun CheckoutScreen(navController: NavController) {
                     item {
                         Button(
                             onClick = {
+                                Log.d("CheckoutDebug", "Confirm button clicked")
                                 if (validateForm(customerName, customerEmail, customerPhone, shippingAddress)) {
                                     shouldProcessOrder = true
+                                } else {
+                                    errorMessage = "Por favor completa todos los campos correctamente"
                                 }
                             },
                             modifier = Modifier.fillMaxWidth(),
@@ -171,8 +237,9 @@ fun OrderSummary(cartItems: List<CartItem>, total: Double) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            LazyColumn {
-                items(cartItems) { item ->
+            // REEMPLAZAMOS EL LAZYCOLUMN INTERNO POR UN COLUMN NORMAL
+            Column {
+                cartItems.forEach { item ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -231,9 +298,10 @@ fun CustomerInfoForm(
             OutlinedTextField(
                 value = customerName,
                 onValueChange = onCustomerNameChange,
-                label = { Text("Nombre completo") },
+                label = { Text("Nombre completo *") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                isError = customerName.isEmpty()
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -241,10 +309,11 @@ fun CustomerInfoForm(
             OutlinedTextField(
                 value = customerEmail,
                 onValueChange = onCustomerEmailChange,
-                label = { Text("Email") },
+                label = { Text("Email *") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                singleLine = true
+                singleLine = true,
+                isError = customerEmail.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(customerEmail).matches()
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -252,10 +321,11 @@ fun CustomerInfoForm(
             OutlinedTextField(
                 value = customerPhone,
                 onValueChange = onCustomerPhoneChange,
-                label = { Text("Teléfono") },
+                label = { Text("Teléfono *") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                singleLine = true
+                singleLine = true,
+                isError = customerPhone.isEmpty()
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -263,10 +333,11 @@ fun CustomerInfoForm(
             OutlinedTextField(
                 value = shippingAddress,
                 onValueChange = onShippingAddressChange,
-                label = { Text("Dirección de envío") },
+                label = { Text("Dirección de envío *") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = false,
-                maxLines = 3
+                maxLines = 3,
+                isError = shippingAddress.isEmpty()
             )
 
             Spacer(modifier = Modifier.height(8.dp))
