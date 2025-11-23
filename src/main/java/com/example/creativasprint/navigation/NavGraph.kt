@@ -11,6 +11,7 @@ import com.example.creativasprint.auth.SplashScreen
 import com.example.creativasprint.client.ClientMainScreen
 import com.example.creativasprint.client.products.ProductListScreen
 import com.example.creativasprint.destinations.Destinations
+import com.example.creativasprint.client.cart.CartScreen
 
 @Composable
 fun NavGraph() {
@@ -38,6 +39,9 @@ fun NavGraph() {
         // Nuevas rutas para cliente
         composable(Destinations.ProductList.route) {
             ProductListScreen(navController = navController)
+        }
+        composable(Destinations.Cart.route) {
+            CartScreen(navController = navController)
         }
         // Agregaremos más rutas...
     }
