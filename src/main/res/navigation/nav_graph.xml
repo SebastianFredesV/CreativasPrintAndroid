@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/splashFragment">
+
+    <!-- AUTH FLOW -->
+    <fragment
+        android:id="@+id/splashFragment"
+        android:name="com.example.creativasprint.auth.SplashFragment"
+        android:label="SplashFragment"
+        tools:layout="@layout/fragment_splash">
+
+        <action
+            android:id="@+id/action_splash_to_login"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_splash_to_client_main"
+            app:destination="@id/clientMainFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_splash_to_admin_main"
+            app:destination="@id/adminMainFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.creativasprint.auth.LoginFragment"
+        android:label="LoginFragment"
+        tools:layout="@layout/fragment_login">
+
+        <action
+            android:id="@+id/action_login_to_register"
+            app:destination="@id/registerFragment" />
+
+        <action
+            android:id="@+id/action_login_to_client_main"
+            app:destination="@id/clientMainFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_login_to_admin_main"
+            app:destination="@id/adminMainFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.creativasprint.auth.RegisterFragment"
+        android:label="RegisterFragment"
+        tools:layout="@layout/fragment_register">
+
+        <action
+            android:id="@+id/action_register_to_login"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/registerFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_register_to_client_main"
+            app:destination="@id/clientMainFragment"
+            app:popUpTo="@id/registerFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- CLIENT FLOW -->
+    <fragment
+        android:id="@+id/clientMainFragment"
+        android:name="com.example.creativasprint.client.ClientMainFragment"
+        android:label="ClientMainFragment"
+        tools:layout="@layout/fragment_client_main">
+
+        <action
+            android:id="@+id/action_client_main_to_login"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/clientMainFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_client_main_to_product_list"
+            app:destination="@id/productListFragment" />
+
+        <action
+            android:id="@+id/action_client_main_to_cart"
+            app:destination="@id/cartFragment" />
+
+        <action
+            android:id="@+id/action_client_main_to_order_history"
+            app:destination="@id/orderHistoryFragment" />
+
+        <action
+            android:id="@+id/action_client_main_to_profile"
+            app:destination="@id/profileFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/productListFragment"
+        android:name="com.example.creativasprint.client.products.ProductListFragment"
+        android:label="ProductListFragment"
+        tools:layout="@layout/fragment_product_list">
+
+        <action
+            android:id="@+id/action_product_list_to_cart"
+            app:destination="@id/cartFragment" />
+
+        <action
+            android:id="@+id/action_product_list_to_client_main"
+            app:destination="@id/clientMainFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/cartFragment"
+        android:name="com.example.creativasprint.client.cart.CartFragment"
+        android:label="CartFragment"
+        tools:layout="@layout/fragment_cart">
+
+        <action
+            android:id="@+id/action_cart_to_checkout"
+            app:destination="@id/checkoutFragment" />
+
+        <action
+            android:id="@+id/action_cart_to_product_list"
+            app:destination="@id/productListFragment" />
+
+        <action
+            android:id="@+id/action_cart_to_client_main"
+            app:destination="@id/clientMainFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/checkoutFragment"
+        android:name="com.example.creativasprint.client.checkout.CheckoutFragment"
+        android:label="CheckoutFragment"
+        tools:layout="@layout/fragment_checkout">
+
+        <action
+            android:id="@+id/action_checkout_to_order_confirmation"
+            app:destination="@id/orderConfirmationFragment">
+            <argument
+                android:name="orderId"
+                app:argType="string" />
+        </action>
+
+        <action
+            android:id="@+id/action_checkout_to_cart"
+            app:destination="@id/cartFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/orderConfirmationFragment"
+        android:name="com.example.creativasprint.client.checkout.OrderConfirmationFragment"
+        android:label="OrderConfirmationFragment"
+        tools:layout="@layout/fragment_order_confirmation">
+
+        <argument
+            android:name="orderId"
+            app:argType="string" />
+
+        <action
+            android:id="@+id/action_order_confirmation_to_client_main"
+            app:destination="@id/clientMainFragment"
+            app:popUpTo="@id/clientMainFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_order_confirmation_to_order_history"
+            app:destination="@id/orderHistoryFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/orderHistoryFragment"
+        android:name="com.example.creativasprint.client.orders.OrderHistoryFragment"
+        android:label="OrderHistoryFragment"
+        tools:layout="@layout/fragment_order_history">
+
+        <action
+            android:id="@+id/action_order_history_to_client_main"
+            app:destination="@id/clientMainFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.creativasprint.client.profile.ProfileFragment"
+        android:label="ProfileFragment"
+        tools:layout="@layout/fragment_profile">
+
+        <action
+            android:id="@+id/action_profile_to_client_main"
+            app:destination="@id/clientMainFragment" />
+    </fragment>
+
+    <!-- ADMIN FLOW -->
+    <fragment
+        android:id="@+id/adminMainFragment"
+        android:name="com.example.creativasprint.admin.AdminMainFragment"
+        android:label="AdminMainFragment"
+        tools:layout="@layout/fragment_admin_main">
+
+        <action
+            android:id="@+id/action_admin_main_to_login"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/adminMainFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_admin_main_to_products"
+            app:destination="@id/adminProductsFragment" />
+
+        <action
+            android:id="@+id/action_admin_main_to_orders"
+            app:destination="@id/adminOrdersFragment" />
+
+        <action
+            android:id="@+id/action_admin_main_to_users"
+            app:destination="@id/adminUsersFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/adminProductsFragment"
+        android:name="com.example.creativasprint.admin.products.AdminProductsFragment"
+        android:label="AdminProductsFragment"
+        tools:layout="@layout/fragment_admin_products">
+
+        <action
+            android:id="@+id/action_admin_products_to_main"
+            app:destination="@id/adminMainFragment" />
+
+        <action
+            android:id="@+id/action_admin_products_to_product_form"
+            app:destination="@id/adminProductFormFragment">
+            <argument
+                android:name="productId"
+                app:argType="string"
+                android:defaultValue="new" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/adminProductFormFragment"
+        android:name="com.example.creativasprint.admin.products.AdminProductFormFragment"
+        android:label="AdminProductFormFragment"
+        tools:layout="@layout/fragment_admin_product_form">
+
+        <argument
+            android:name="productId"
+            app:argType="string"
+            android:defaultValue="new" />
+
+        <action
+            android:id="@+id/action_admin_product_form_to_products"
+            app:destination="@id/adminProductsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/adminOrdersFragment"
+        android:name="com.example.creativasprint.admin.orders.AdminOrdersFragment"
+        android:label="AdminOrdersFragment"
+        tools:layout="@layout/fragment_admin_orders">
+
+        <action
+            android:id="@+id/action_admin_orders_to_main"
+            app:destination="@id/adminMainFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/adminUsersFragment"
+        android:name="com.example.creativasprint.admin.users.AdminUsersFragment"
+        android:label="AdminUsersFragment"
+        tools:layout="@layout/fragment_admin_users">
+
+        <action
+            android:id="@+id/action_admin_users_to_main"
+            app:destination="@id/adminMainFragment" />
+    </fragment>
+
+</navigation>

@@ -14,7 +14,6 @@ class SessionManager(private val context: Context) {
         const val KEY_USER = "user_data"
         const val KEY_IS_LOGGED_IN = "is_logged_in"
         const val KEY_AUTH_TOKEN = "auth_token"
-        // FALTAN ESTAS CONSTANTES:
         const val ROLE_ADMIN = "admin"
         const val ROLE_CLIENT = "client"
     }
@@ -45,7 +44,7 @@ class SessionManager(private val context: Context) {
 
     fun isAdmin(): Boolean {
         val user = getCurrentUser()
-        return user?.role == ROLE_ADMIN  // ✅ Verificar correctamente
+        return user?.role == ROLE_ADMIN
     }
 
     fun logout() = sharedPreferences.edit().clear().apply()

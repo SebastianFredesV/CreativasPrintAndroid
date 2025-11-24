@@ -27,20 +27,42 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/userName"
+                    android:id="@+id/productName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Usuario sin nombre"
+                    android:text="Nombre del Producto"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/userEmail"
+                    android:id="@+id/productPrice"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Email no disponible"
+                    android:text="$0.00"
                     android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/productCategory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Categoría: "
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/productStock"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Stock: 0"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/productStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Estado: Activo"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
@@ -50,58 +72,45 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/changeRoleButton"
-                    android:layout_width="120dp"
-                    android:layout_height="wrap_content"
-                    android:text="client"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:textColor="@color/purple_500" />
-
                 <ImageButton
-                    android:id="@+id/toggleStatusButton"
+                    android:id="@+id/editButton"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:layout_gravity="center_horizontal"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_check_circle"
-                    android:contentDescription="Cambiar estado" />
+                    android:src="@drawable/ic_edit"
+                    app:tint="@color/blue"
+                    android:contentDescription="Editar" />
+
+                <ImageButton
+                    android:id="@+id/deleteButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_delete"
+                    app:tint="@color/red"
+                    android:contentDescription="Eliminar" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <!-- Información adicional -->
+        <!-- Descripción -->
         <TextView
-            android:id="@+id/userStatus"
+            android:id="@+id/productDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="🟢 Activo"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/userPhone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="📞 Teléfono"
+            android:text="Descripción del producto..."
             android:textSize="12sp"
-            android:visibility="gone" />
+            android:textColor="@color/gray" />
 
+        <!-- URL de imagen (debug) -->
         <TextView
-            android:id="@+id/userAddress"
+            android:id="@+id/productImageUrl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="📍 Dirección"
-            android:textSize="12sp"
-            android:visibility="gone" />
-
-        <!-- Nota para desarrollo -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Datos de demostración"
+            android:layout_marginTop="4dp"
+            android:text="Imagen: ..."
             android:textSize="10sp"
             android:textColor="@color/gray_light" />
 

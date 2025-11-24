@@ -40,12 +40,11 @@ class OrderManager(private val context: Context) {
             )
         }
 
-        // Generar un ID único temporal para la orden local
         val temporaryOrderId = UUID.randomUUID().toString()
 
         return Order(
             id = temporaryOrderId,
-            userId = "current_user", // Esto se reemplazará con el ID real del usuario cuando se envíe a la API
+            userId = "current_user",
             items = orderItems,
             total = total,
             status = "pending",
