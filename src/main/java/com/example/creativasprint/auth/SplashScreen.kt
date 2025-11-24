@@ -19,30 +19,27 @@ fun SplashScreen(navController: NavController) {
     val sessionManager = remember { SessionManager(context) }
 
     LaunchedEffect(Unit) {
-        // Pequeña delay para mostrar el splash
         delay(1000)
 
-        // Verificar si hay una sesión activa
         if (sessionManager.isLoggedIn()) {
             val currentUser = sessionManager.getCurrentUser()
             if (currentUser != null) {
-                // Redirigir según el rol
+                // ✅ REDIRIGIR SEGÚN EL ROL GUARDADO
                 val destination = if (sessionManager.isAdmin()) {
                     Destinations.AdminMain.route
                 } else {
                     Destinations.ClientMain.route
                 }
+
                 navController.navigate(destination) {
                     popUpTo(Destinations.Splash.route) { inclusive = true }
                 }
             } else {
-                // No hay usuario, ir a login
                 navController.navigate(Destinations.Login.route) {
                     popUpTo(Destinations.Splash.route) { inclusive = true }
                 }
             }
         } else {
-            // No hay sesión, ir a login
             navController.navigate(Destinations.Login.route) {
                 popUpTo(Destinations.Splash.route) { inclusive = true }
             }

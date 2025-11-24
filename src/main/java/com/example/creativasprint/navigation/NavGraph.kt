@@ -8,6 +8,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.creativasprint.admin.AdminMainScreen
+import com.example.creativasprint.admin.orders.AdminOrdersScreen
+import com.example.creativasprint.admin.products.AdminProductsScreen
+import com.example.creativasprint.admin.users.AdminUsersScreen
 import com.example.creativasprint.auth.LoginScreen
 import com.example.creativasprint.auth.RegisterScreen
 import com.example.creativasprint.auth.SplashScreen  // ✅ AGREGAR ESTA IMPORTACIÓN
@@ -106,14 +110,19 @@ fun NavGraph(navController: NavHostController) {
 
         // Admin Screens (si los tienes implementados)
         composable(Destinations.AdminMain.route) {
-            // Aquí va tu AdminMainScreen cuando lo implementes
-            // Por ahora podemos mostrar un placeholder
-            ClientMainScreen(navController = navController) // Temporal
+            AdminMainScreen(navController = navController)
         }
 
         composable(Destinations.AdminProducts.route) {
-            // Aquí va tu AdminProductsScreen cuando lo implementes
-            ClientMainScreen(navController = navController) // Temporal
+            AdminProductsScreen(navController = navController)
+        }
+
+        composable(Destinations.AdminOrders.route) {
+            AdminOrdersScreen(navController = navController)
+        }
+
+        composable(Destinations.AdminUsers.route) {
+            AdminUsersScreen(navController = navController)  // ✅ Pantalla real
         }
     }
 }

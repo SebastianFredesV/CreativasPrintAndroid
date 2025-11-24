@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,7 +62,7 @@ fun LoginScreen(navController: NavController) {
             value = email,
             onValueChange = {
                 email = it
-                errorMessage = null // Limpiar error cuando el usuario escriba
+                errorMessage = null
             },
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth(),
@@ -76,7 +77,7 @@ fun LoginScreen(navController: NavController) {
             value = password,
             onValueChange = {
                 password = it
-                errorMessage = null // Limpiar error cuando el usuario escriba
+                errorMessage = null
             },
             label = { Text("Contraseña") },
             modifier = Modifier.fillMaxWidth(),
@@ -136,7 +137,6 @@ fun LoginScreen(navController: NavController) {
 }
 
 // Función para realizar login real con la API
-// En LoginScreen.kt - modificar la función performRealLogin
 private fun performRealLogin(
     email: String,
     password: String,
@@ -159,15 +159,34 @@ private fun performRealLogin(
                     val authResponse = response.body()
 
                     if (authResponse != null) {
-                        // ✅ OBTENER DATOS COMPLETOS DEL USUARIO
-                        getUserDetails(
-                            userId = authResponse.userId,
+                        // ✅ DETERMINAR ROL CORRECTAMENTE
+                        val isAdmin = when {
+                            // Caso 1: Email específico de admin
+                            email == "admin@creativasprint.com" -> true
+                            // Caso 2: Podríamos agregar más lógica aquí si es necesario
+                            else -> false
+                        }
+
+                        val user = User(
+                            id = authResponse.userId,
                             email = email,
-                            authToken = authResponse.authToken,
-                            sessionManager = sessionManager,
-                            navController = navController,
-                            onError = onError
+                            name = if (isAdmin) "Administrador" else "Cliente",
+                            role = if (isAdmin) SessionManager.ROLE_ADMIN else SessionManager.ROLE_CLIENT,
+                            isActive = true
                         )
+
+                        sessionManager.saveUserSession(user, authResponse.authToken)
+
+                        // ✅ REDIRIGIR SEGÚN EL ROL CORRECTO
+                        val destination = if (isAdmin) {
+                            Destinations.AdminMain.route
+                        } else {
+                            Destinations.ClientMain.route
+                        }
+
+                        navController.navigate(destination) {
+                            popUpTo(Destinations.Login.route) { inclusive = true }
+                        }
                     } else {
                         onError("Error en la respuesta del servidor")
                     }
@@ -188,85 +207,4 @@ private fun performRealLogin(
             }
         }
     }
-}
-
-// Función para obtener los datos completos del usuario
-private fun getUserDetails(
-    userId: Int,
-    email: String,
-    authToken: String,
-    sessionManager: SessionManager,
-    navController: NavController,
-    onError: (String) -> Unit
-) {
-    CoroutineScope(Dispatchers.IO).launch {
-        try {
-            // Necesitamos agregar este endpoint a ApiService
-            val userResponse = ApiClient.apiService.getUserById(userId.toString())
-
-            withContext(Dispatchers.Main) {
-                if (userResponse.isSuccessful) {
-                    val user = userResponse.body()
-                    if (user != null) {
-                        // ✅ Guardar sesión con datos reales del usuario
-                        sessionManager.saveUserSession(user, authToken)
-
-                        // Redirigir según el rol REAL
-                        val destination = if (user.role == SessionManager.ROLE_ADMIN) {
-                            Destinations.AdminMain.route
-                        } else {
-                            Destinations.ClientMain.route
-                        }
-
-                        navController.navigate(destination) {
-                            popUpTo(Destinations.Login.route) { inclusive = true }
-                        }
-                    } else {
-                        onError("No se pudieron obtener los datos del usuario")
-                    }
-                } else {
-                    // Si falla, usar datos temporales basados en el email
-                    val temporaryUser = createTemporaryUser(userId, email)
-                    sessionManager.saveUserSession(temporaryUser, authToken)
-
-                    val destination = if (email == "admin@creativasprint.com") {
-                        Destinations.AdminMain.route
-                    } else {
-                        Destinations.ClientMain.route
-                    }
-
-                    navController.navigate(destination) {
-                        popUpTo(Destinations.Login.route) { inclusive = true }
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            withContext(Dispatchers.Main) {
-                // Fallback: usar datos temporales
-                val temporaryUser = createTemporaryUser(userId, email)
-                sessionManager.saveUserSession(temporaryUser, authToken)
-
-                val destination = if (email == "admin@creativasprint.com") {
-                    Destinations.AdminMain.route
-                } else {
-                    Destinations.ClientMain.route
-                }
-
-                navController.navigate(destination) {
-                    popUpTo(Destinations.Login.route) { inclusive = true }
-                }
-            }
-        }
-    }
-}
-
-// Función para crear usuario temporal si no podemos obtener los datos completos
-private fun createTemporaryUser(userId: Int, email: String): User {
-    return User(
-        id = userId,
-        email = email,
-        name = if (email == "admin@creativasprint.com") "Administrador" else "Cliente",
-        role = if (email == "admin@creativasprint.com") SessionManager.ROLE_ADMIN else SessionManager.ROLE_CLIENT,
-        isActive = true
-    )
 }

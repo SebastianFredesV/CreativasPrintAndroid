@@ -3,10 +3,7 @@ package com.example.creativasprint.network
 import com.example.creativasprint.model.Order
 import com.example.creativasprint.model.Product
 import com.example.creativasprint.model.User
-import com.example.creativasprint.network.requests.CreateOrderRequest
-import com.example.creativasprint.network.requests.LoginRequest
-import com.example.creativasprint.network.requests.RegisterRequest
-import com.example.creativasprint.network.requests.UpdateOrderStatusRequest
+import com.example.creativasprint.network.requests.*
 import com.example.creativasprint.network.responses.ApiResponse
 import com.example.creativasprint.network.responses.XanoAuthResponse
 import retrofit2.Response
@@ -22,7 +19,6 @@ interface ApiService {
     suspend fun register(@Body request: RegisterRequest): Response<XanoAuthResponse>
 
     // ============ PRODUCT ENDPOINTS ============
-    // CAMBIAR de "products" a "product" (singular)
     @GET("product")
     suspend fun getProducts(): Response<List<Product>>
 
@@ -38,15 +34,23 @@ interface ApiService {
     @DELETE("product/{id}")
     suspend fun deleteProduct(@Path("id") productId: Int): Response<ApiResponse>
 
-    // ============ USER ENDPOINTS (Admin only) ============
-    @GET("admin/users")
-    suspend fun getUsers(): Response<List<User>>
+    // ============ USER ENDPOINTS (usando tus endpoints reales) ============
 
-    @PUT("admin/users/{id}/block")
-    suspend fun blockUser(@Path("id") userId: Int): Response<User>
+    // ✅ Obtener usuarios del equipo
+    @GET("account/my_team_members")
+    suspend fun getTeamMembers(): Response<List<User>>
 
-    @PUT("admin/users/{id}/unblock")
-    suspend fun unblockUser(@Path("id") userId: Int): Response<User>
+    // ✅ Actualizar rol de usuario
+    @POST("admin/user_role")
+    suspend fun updateUserRole(@Body request: UpdateUserRoleRequest): Response<User>
+
+    // ✅ Editar perfil de usuario (para activar/desactivar)
+    @PATCH("user/edit_profile")
+    suspend fun updateUserProfile(@Body request: UpdateUserProfileRequest): Response<User>
+
+    // ✅ Obtener detalles de usuario específico
+    @GET("account/details")
+    suspend fun getAccountDetails(): Response<User>
 
     // ============ ORDER ENDPOINTS ============
     @GET("orders")
@@ -64,7 +68,4 @@ interface ApiService {
         @Path("id") orderId: Int,
         @Body request: UpdateOrderStatusRequest
     ): Response<Order>
-
-    @GET("users/{id}")
-    suspend fun getUserById(@Path("id") userId: String): Response<User>
 }

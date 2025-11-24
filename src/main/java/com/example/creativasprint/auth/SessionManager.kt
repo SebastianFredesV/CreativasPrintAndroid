@@ -43,7 +43,10 @@ class SessionManager(private val context: Context) {
 
     fun isLoggedIn(): Boolean = sharedPreferences.getBoolean(KEY_IS_LOGGED_IN, false)
 
-    fun isAdmin(): Boolean = getCurrentUser()?.role == "admin"
+    fun isAdmin(): Boolean {
+        val user = getCurrentUser()
+        return user?.role == ROLE_ADMIN  // ✅ Verificar correctamente
+    }
 
     fun logout() = sharedPreferences.edit().clear().apply()
 }
