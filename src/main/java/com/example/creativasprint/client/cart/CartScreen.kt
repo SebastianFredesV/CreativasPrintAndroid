@@ -159,8 +159,8 @@ fun EmptyCartState() {
 @Composable
 fun CartItemsList(
     cartItems: List<CartItem>,
-    onQuantityChange: (String, Int) -> Unit,
-    onRemoveItem: (String) -> Unit
+    onQuantityChange: (Int, Int) -> Unit,
+    onRemoveItem: (Int) -> Unit
 ) {
     LazyColumn(
         contentPadding = PaddingValues(8.dp),
@@ -179,8 +179,8 @@ fun CartItemsList(
 @Composable
 fun CartItemCard(
     item: CartItem,
-    onQuantityChange: (String, Int) -> Unit,
-    onRemoveItem: (String) -> Unit
+    onQuantityChange: (Int, Int) -> Unit,
+    onRemoveItem: (Int) -> Unit
 ) {
     Card {
         Column(

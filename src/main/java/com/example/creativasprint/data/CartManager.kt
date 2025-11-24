@@ -28,7 +28,7 @@ class CartManager(private val context: Context) {
         } else {
             // Agregar nuevo item
             val newItem = CartItem(
-                id = System.currentTimeMillis().toString(),
+                id = System.currentTimeMillis().toInt(),
                 productId = product.id,
                 productName = product.nombre,
                 productPrice = product.precio,
@@ -50,7 +50,7 @@ class CartManager(private val context: Context) {
         }
     }
 
-    fun updateQuantity(productId: String, newQuantity: Int) {
+    fun updateQuantity(productId: Int, newQuantity: Int) {
         if (newQuantity <= 0) {
             removeFromCart(productId)
             return
@@ -65,7 +65,7 @@ class CartManager(private val context: Context) {
         }
     }
 
-    fun removeFromCart(productId: String) {
+    fun removeFromCart(productId: Int) {
         val currentItems = getCartItems().toMutableList()
         currentItems.removeAll { it.productId == productId }
         saveCartItems(currentItems)

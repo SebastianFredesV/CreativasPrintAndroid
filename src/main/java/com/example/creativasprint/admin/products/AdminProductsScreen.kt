@@ -46,7 +46,7 @@ fun AdminProductsScreen(navController: NavController) {
     // Datos de ejemplo para desarrollo
     val sampleProducts = listOf(
         Product(
-            id = "1",
+            id = 1,
             nombre = "Agenda Alicia en el País de las Maravillas",
             precio = 15000.0,
             color = "Azul",
@@ -57,7 +57,7 @@ fun AdminProductsScreen(navController: NavController) {
             isActive = true
         ),
         Product(
-            id = "2",
+            id = 2,
             nombre = "Agenda Beetle Juice",
             precio = 15000.0,
             color = "Blanco y negro",
@@ -68,7 +68,7 @@ fun AdminProductsScreen(navController: NavController) {
             isActive = true
         ),
         Product(
-            id = "3",
+            id = 3,
             nombre = "Agenda El cadáver de la novia",
             precio = 18000.0,
             color = "Morado",
