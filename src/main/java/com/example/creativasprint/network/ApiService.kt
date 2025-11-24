@@ -8,7 +8,7 @@ import com.example.creativasprint.network.requests.LoginRequest
 import com.example.creativasprint.network.requests.RegisterRequest
 import com.example.creativasprint.network.requests.UpdateOrderStatusRequest
 import com.example.creativasprint.network.responses.ApiResponse
-import com.example.creativasprint.network.responses.AuthResponse
+import com.example.creativasprint.network.responses.XanoAuthResponse
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -16,45 +16,37 @@ interface ApiService {
 
     // ============ AUTH ENDPOINTS ============
     @POST("auth/login")
-    suspend fun login(@Body request: LoginRequest): Response<AuthResponse>
+    suspend fun login(@Body request: LoginRequest): Response<XanoAuthResponse>
 
     @POST("auth/register")
-    suspend fun register(@Body request: RegisterRequest): Response<AuthResponse>
+    suspend fun register(@Body request: RegisterRequest): Response<XanoAuthResponse>
 
-    // ============ PRODUCT ENDPOINTS (Xano) ============
-
-    @GET("products")
+    // ============ PRODUCT ENDPOINTS ============
+    // CAMBIAR de "products" a "product" (singular)
+    @GET("product")
     suspend fun getProducts(): Response<List<Product>>
 
-    @GET("products/{id}")
-    suspend fun getProductById(@Path("id") productId: String): Response<Product>
+    @GET("product/{id}")
+    suspend fun getProductById(@Path("id") productId: Int): Response<Product>
 
-    @POST("products")
+    @POST("product")
     suspend fun createProduct(@Body product: Product): Response<Product>
 
-    @PUT("products/{id}")
-    suspend fun updateProduct(
-        @Path("id") productId: String,
-        @Body product: Product
-    ): Response<Product>
+    @PUT("product/{id}")
+    suspend fun updateProduct(@Path("id") productId: Int, @Body product: Product): Response<Product>
 
-    @DELETE("products/{id}")
-    suspend fun deleteProduct(@Path("id") productId: String): Response<ApiResponse>
+    @DELETE("product/{id}")
+    suspend fun deleteProduct(@Path("id") productId: Int): Response<ApiResponse>
 
-
-    // ============ USER ENDPOINTS ============
-    @GET("users/{id}")
-    suspend fun getUserById(@Path("id") userId: String): Response<User>
-
+    // ============ USER ENDPOINTS (Admin only) ============
     @GET("admin/users")
     suspend fun getUsers(): Response<List<User>>
 
     @PUT("admin/users/{id}/block")
-    suspend fun blockUser(@Path("id") userId: String): Response<User>
+    suspend fun blockUser(@Path("id") userId: Int): Response<User>
 
     @PUT("admin/users/{id}/unblock")
-    suspend fun unblockUser(@Path("id") userId: String): Response<User>
-
+    suspend fun unblockUser(@Path("id") userId: Int): Response<User>
 
     // ============ ORDER ENDPOINTS ============
     @GET("orders")
@@ -63,12 +55,13 @@ interface ApiService {
     @POST("orders")
     suspend fun createOrder(@Body request: CreateOrderRequest): Response<Order>
 
+    // Admin orders
     @GET("admin/orders")
     suspend fun getAdminOrders(): Response<List<Order>>
 
     @PUT("admin/orders/{id}/status")
     suspend fun updateOrderStatus(
-        @Path("id") orderId: String,
+        @Path("id") orderId: Int,
         @Body request: UpdateOrderStatusRequest
     ): Response<Order>
 }

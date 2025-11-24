@@ -1,13 +1,6 @@
 package com.example.creativasprint.client.products
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -32,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.creativasprint.data.CartManager
 import com.example.creativasprint.model.Product
 import com.example.creativasprint.network.ApiClient
@@ -103,6 +99,7 @@ fun ProductListScreen(navController: NavController, cartManager: CartManager) {
                         CircularProgressIndicator()
                     }
                 }
+
                 errorMessage != null -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -111,18 +108,46 @@ fun ProductListScreen(navController: NavController, cartManager: CartManager) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text("Error al cargar productos")
                             Text(errorMessage ?: "Error desconocido")
-                            // Podrías agregar un botón de reintento aquí
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = {
+                                    isLoading = true
+                                    errorMessage = null
+                                    loadProducts(
+                                        onLoading = { isLoading = it },
+                                        onSuccess = {
+                                            products = it
+                                            filteredProducts = it
+                                            isLoading = false
+                                        },
+                                        onError = {
+                                            errorMessage = it
+                                            isLoading = false
+                                        }
+                                    )
+                                }
+                            ) {
+                                Text("Reintentar")
+                            }
                         }
                     }
                 }
+
                 filteredProducts.isEmpty() -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("No se encontraron productos")
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("No se encontraron productos")
+                            if (products.isEmpty()) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text("Verifica que hay productos en la base de datos")
+                            }
+                        }
                     }
                 }
+
                 else -> {
                     // Grid de productos
                     LazyVerticalGrid(
@@ -164,29 +189,91 @@ private fun loadProducts(
             withContext(Dispatchers.Main) {
                 if (response.isSuccessful) {
                     val productsList = response.body() ?: emptyList()
-                    // Filtrar solo productos activos
-                    val activeProducts = productsList.filter { it.isActive }
-                    onSuccess(activeProducts)
+                    println("DEBUG: Productos recibidos: ${productsList.size}")
+
+                    // Filtrar productos válidos (elimina productos vacíos o inválidos)
+                    val validProducts = productsList.filter {
+                        it.isValid() && it.nombre.isNotEmpty() && it.precio > 0
+                    }
+
+                    println("DEBUG: Productos válidos: ${validProducts.size}")
+                    validProducts.forEach { product ->
+                        println("DEBUG: Producto: ${product.nombre}, Imagen: ${product.getImageUrl()}")
+                    }
+
+                    onSuccess(validProducts)
                 } else {
-                    onError("Error al cargar productos: ${response.code()}")
+                    onError("Error ${response.code()} al cargar productos: ${response.message()}")
                 }
             }
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
+                println("DEBUG: Excepción: ${e.message}")
                 onError("Error de conexión: ${e.message}")
             }
         }
     }
 }
 
-// Componente ProductCard (si no lo tienes, aquí está una versión básica)
+// Componente ProductCard
 @Composable
 fun ProductCard(
     product: Product,
     onAddToCart: () -> Unit,
     onProductClick: () -> Unit
 ) {
-    // Aquí va tu implementación de ProductCard
-    // Debe mostrar: imagen, nombre, precio, botón "Agregar al carrito"
-    // Usa Coil para cargar imágenes: rememberImagePainter(product.imagen)
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+        onClick = onProductClick
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            // Imagen del producto
+            AsyncImage(
+                model = product.getImageUrl(),
+                contentDescription = product.nombre,
+                modifier = Modifier
+                    .height(120.dp)
+                    .fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Nombre del producto
+            Text(
+                text = product.nombre,
+                maxLines = 2
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Precio
+            Text(
+                text = "$${String.format("%.0f", product.precio)}",
+                style = androidx.compose.material3.MaterialTheme.typography.titleMedium
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Categoría
+            Text(
+                text = product.categoria,
+                style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+                color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Botón agregar al carrito
+            Button(
+                onClick = onAddToCart,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Agregar al Carrito")
+            }
+        }
+    }
 }

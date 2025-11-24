@@ -5,6 +5,6 @@ data class CartItem(
     val productId: Int,
     val productName: String,
     val productPrice: Double,
-    val productImage: String,
+    val productImage: String, // Mantener como String para simplificar
     val quantity: Int
 )

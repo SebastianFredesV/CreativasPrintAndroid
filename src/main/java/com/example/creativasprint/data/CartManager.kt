@@ -18,21 +18,17 @@ class CartManager(private val context: Context) {
 
     fun addToCart(product: Product, quantity: Int = 1) {
         val currentItems = getCartItems().toMutableList()
-
-        // Verificar si el producto ya está en el carrito
         val existingItem = currentItems.find { it.productId == product.id }
 
         if (existingItem != null) {
-            // Actualizar cantidad si ya existe
             updateQuantity(product.id, existingItem.quantity + quantity)
         } else {
-            // Agregar nuevo item
             val newItem = CartItem(
                 id = System.currentTimeMillis().toInt(),
                 productId = product.id,
                 productName = product.nombre,
                 productPrice = product.precio,
-                productImage = product.imagen,
+                productImage = product.getImageUrl(), // Usar la URL de la imagen
                 quantity = quantity
             )
             currentItems.add(newItem)
