@@ -34,7 +34,7 @@ import com.example.creativasprint.data.OrderManager
 import com.example.creativasprint.model.Order
 
 @Composable
-fun OrderHistoryScreen(navController: NavController) {
+fun OrderHistoryScreen(navController: NavController, orderManager: OrderManager) {
     val context = LocalContext.current
     val orderManager = remember { OrderManager(context) }
 

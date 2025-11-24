@@ -31,22 +31,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.creativasprint.data.CartManager
+import com.example.creativasprint.data.OrderManager
 import com.example.creativasprint.model.CartItem
 
 @Composable
-fun CartScreen(navController: NavController) {
-    val context = LocalContext.current
-    val cartManager = remember { CartManager(context) }
-
+fun CartScreen(
+    navController: NavController,
+    cartManager: CartManager,
+    orderManager: OrderManager // Aunque no se use aquí, se pasa para consistencia
+) {
     var cartItems by remember { mutableStateOf<List<CartItem>>(emptyList()) }
     var total by remember { mutableStateOf(0.0) }
 
     LaunchedEffect(Unit) {
+        cartItems = cartManager.getCartItems()
+        total = cartManager.getCartTotal()
+    }
+
+    // Actualizar cuando cambien los datos
+    LaunchedEffect(cartManager) {
         cartItems = cartManager.getCartItems()
         total = cartManager.getCartTotal()
     }

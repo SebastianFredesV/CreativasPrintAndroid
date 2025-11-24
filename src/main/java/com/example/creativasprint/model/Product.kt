@@ -10,6 +10,6 @@ data class Product(
     @SerializedName("descripcion") val descripcion: String,
     @SerializedName("imagen") val imagen: String,
     @SerializedName("categoria") val categoria: String,
-    @SerializedName("stock") val stock: Int = 0,
+    @SerializedName("stock") val stock: Int,
     @SerializedName("is_active") val isActive: Boolean = true
 )

@@ -158,10 +158,9 @@ private fun performRealLogin(
                     val authResponse = response.body()
 
                     if (authResponse?.success == true && authResponse.user != null) {
-                        // ✅ Login exitoso - Guardar sesión
+                        // ✅ Login exitoso
                         sessionManager.saveUserSession(authResponse.user, authResponse.token)
 
-                        // Redirigir según el rol
                         val destination = if (authResponse.user.role == SessionManager.ROLE_ADMIN) {
                             Destinations.AdminMain.route
                         } else {
@@ -172,7 +171,7 @@ private fun performRealLogin(
                             popUpTo(Destinations.Login.route) { inclusive = true }
                         }
                     } else {
-                        // ❌ Login fallido - Credenciales incorrectas
+                        // ❌ Login fallido
                         onError(authResponse?.message ?: "Credenciales incorrectas")
                     }
                 } else {
@@ -189,8 +188,15 @@ private fun performRealLogin(
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
                 onLoading(false)
-                // ❌ Error de conexión
-                onError("Error de conexión: ${e.message}")
+                // ❌ Error de conexión - Manejamos específicamente el error de permisos
+                val errorMsg = when {
+                    e.message?.contains("Permission denied") == true ->
+                        "Error de permisos: La app no tiene acceso a internet"
+                    e.message?.contains("Unable to resolve host") == true ->
+                        "Error de conexión: No se puede conectar al servidor"
+                    else -> "Error de conexión: ${e.message}"
+                }
+                onError(errorMsg)
             }
         }
     }

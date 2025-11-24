@@ -40,7 +40,7 @@ import com.example.creativasprint.model.CartItem
 import kotlinx.coroutines.delay
 
 @Composable
-fun CheckoutScreen(navController: NavController) {
+fun CheckoutScreen(navController: NavController, cartManager: CartManager, orderManager: OrderManager) {
     val context = LocalContext.current
     val cartManager = remember { CartManager(context) }
     val orderManager = remember { OrderManager(context) }
