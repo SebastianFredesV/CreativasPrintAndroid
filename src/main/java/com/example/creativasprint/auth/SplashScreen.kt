@@ -2,9 +2,10 @@ package com.example.creativasprint.auth
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -15,22 +16,33 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(navController: NavController) {
     val context = LocalContext.current
-    val sessionManager = SessionManager(context)
+    val sessionManager = remember { SessionManager(context) }
 
     LaunchedEffect(Unit) {
-        delay(2000) // 2 segundos de splash
+        // Pequeña delay para mostrar el splash
+        delay(1000)
 
+        // Verificar si hay una sesión activa
         if (sessionManager.isLoggedIn()) {
-            // Redirigir según el rol
-            val destination = if (sessionManager.isAdmin()) {
-                Destinations.AdminMain.route
+            val currentUser = sessionManager.getCurrentUser()
+            if (currentUser != null) {
+                // Redirigir según el rol
+                val destination = if (sessionManager.isAdmin()) {
+                    Destinations.AdminMain.route
+                } else {
+                    Destinations.ClientMain.route
+                }
+                navController.navigate(destination) {
+                    popUpTo(Destinations.Splash.route) { inclusive = true }
+                }
             } else {
-                Destinations.ClientMain.route
-            }
-            navController.navigate(destination) {
-                popUpTo(Destinations.Splash.route) { inclusive = true }
+                // No hay usuario, ir a login
+                navController.navigate(Destinations.Login.route) {
+                    popUpTo(Destinations.Splash.route) { inclusive = true }
+                }
             }
         } else {
+            // No hay sesión, ir a login
             navController.navigate(Destinations.Login.route) {
                 popUpTo(Destinations.Splash.route) { inclusive = true }
             }
@@ -41,6 +53,6 @@ fun SplashScreen(navController: NavController) {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text("CreativasPrint")
+        CircularProgressIndicator()
     }
 }

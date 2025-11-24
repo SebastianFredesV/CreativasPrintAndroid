@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.creativasprint.data.CartManager
 import com.example.creativasprint.data.OrderManager
+import com.example.creativasprint.destinations.Destinations
 import com.example.creativasprint.model.CartItem
 import kotlinx.coroutines.delay
 
@@ -120,8 +121,8 @@ fun CheckoutScreen(navController: NavController, cartManager: CartManager, order
 
                     // Navegar a confirmación
                     Log.d("CheckoutDebug", "Navigating to confirmation...")
-                    navController.navigate("order_confirmation/${order.id}") {
-                        popUpTo("checkout") { inclusive = true }
+                    navController.navigate(Destinations.OrderConfirmation.createRoute(order.id)) {
+                        popUpTo(Destinations.Checkout.route) { inclusive = true }
                     }
 
                 } catch (e: Exception) {

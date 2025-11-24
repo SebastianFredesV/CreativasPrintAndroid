@@ -34,10 +34,11 @@ import com.example.creativasprint.data.OrderManager
 import com.example.creativasprint.model.Order
 
 @Composable
-fun OrderHistoryScreen(navController: NavController, orderManager: OrderManager) {
+fun OrderHistoryScreen(
+    navController: NavController,
+    orderManager: OrderManager
+) {
     val context = LocalContext.current
-    val orderManager = remember { OrderManager(context) }
-
     var orders by remember { mutableStateOf<List<Order>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
 
@@ -127,12 +128,12 @@ fun OrderCard(order: Order) {
             ) {
                 Column {
                     Text(
-                        "Pedido #${order.id.take(8)}",
+                        "Pedido #${order.id.take(8)}", // ✅ Usar take() es seguro
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        order.createdAt,
+                        order.createdAt ?: "Fecha no disponible", // ✅ Manejar null
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -151,20 +152,25 @@ fun OrderCard(order: Order) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Resumen de items
-            order.items.take(2).forEach { item ->
+            // Resumen de items - ✅ Manejar lista vacía o nula
+            order.items?.take(2)?.forEach { item ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("${item.productName} x${item.quantity}")
+                    Text("${item.productName ?: "Producto"} x${item.quantity}") // ✅ Manejar null
                     Text("$${String.format("%.0f", item.price * item.quantity)}")
                 }
+            } ?: run {
+                // Si items es null
+                Text("No hay productos en este pedido", style = MaterialTheme.typography.bodySmall)
             }
 
-            if (order.items.size > 2) {
+            // ✅ Manejar null en items.size
+            val itemsCount = order.items?.size ?: 0
+            if (itemsCount > 2) {
                 Text(
-                    "... y ${order.items.size - 2} productos más",
+                    "... y ${itemsCount - 2} productos más",
                     style = MaterialTheme.typography.bodySmall
                 )
             }

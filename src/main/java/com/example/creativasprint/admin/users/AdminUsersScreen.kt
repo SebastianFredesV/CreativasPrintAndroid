@@ -2,7 +2,6 @@ package com.example.creativasprint.admin.users
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,7 +18,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,21 +39,21 @@ fun AdminUsersScreen(navController: NavController) {
     // Datos de ejemplo
     val sampleUsers = listOf(
         User(
-            id = "1",
+            id = 1,
             email = "admin@creativasprint.com",
             name = "Administrador",
             role = "admin",
             isActive = true
         ),
         User(
-            id = "2",
+            id = 2,
             email = "cliente@creativasprint.com",
             name = "Cliente Demo",
             role = "client",
             isActive = true
         ),
         User(
-            id = "3",
+            id = 3,
             email = "juan.perez@email.com",
             name = "Juan Pérez",
             role = "client",

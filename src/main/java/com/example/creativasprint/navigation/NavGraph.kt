@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.creativasprint.auth.LoginScreen
 import com.example.creativasprint.auth.RegisterScreen
+import com.example.creativasprint.auth.SplashScreen  // ✅ AGREGAR ESTA IMPORTACIÓN
 import com.example.creativasprint.client.ClientMainScreen
 import com.example.creativasprint.client.cart.CartScreen
 import com.example.creativasprint.client.checkout.CheckoutScreen
@@ -27,8 +28,13 @@ fun NavGraph(navController: NavHostController) {
 
     NavHost(
         navController = navController,
-        startDestination = Destinations.Login.route
+        startDestination = Destinations.Splash.route
     ) {
+        // ✅ SPLASH SCREEN (ahora con importación correcta)
+        composable(Destinations.Splash.route) {
+            SplashScreen(navController = navController)
+        }
+
         // Auth Screens
         composable(Destinations.Login.route) {
             LoginScreen(navController = navController)
@@ -43,7 +49,7 @@ fun NavGraph(navController: NavHostController) {
         }
 
         // Client Product Screens
-        composable("product_list") {
+        composable(Destinations.ProductList.route) {  // ✅ Usar Destinations en lugar de string
             val cartManager = remember { CartManager(context) }
             ProductListScreen(
                 navController = navController,
@@ -52,7 +58,7 @@ fun NavGraph(navController: NavHostController) {
         }
 
         // Client Cart & Checkout Screens
-        composable("cart") {
+        composable(Destinations.Cart.route) {  // ✅ Usar Destinations
             val cartManager = remember { CartManager(context) }
             val orderManager = remember { OrderManager(context) }
             CartScreen(
@@ -62,7 +68,7 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
-        composable("checkout") {
+        composable(Destinations.Checkout.route) {  // ✅ Usar Destinations
             val cartManager = remember { CartManager(context) }
             val orderManager = remember { OrderManager(context) }
             CheckoutScreen(
@@ -74,7 +80,7 @@ fun NavGraph(navController: NavHostController) {
 
         // Order Confirmation con parámetro
         composable(
-            route = "order_confirmation/{orderId}",
+            route = Destinations.OrderConfirmation.route,
             arguments = listOf(navArgument("orderId") { type = NavType.StringType })
         ) { backStackEntry ->
             val orderId = backStackEntry.arguments?.getString("orderId")
@@ -85,7 +91,7 @@ fun NavGraph(navController: NavHostController) {
         }
 
         // Client Order History
-        composable("order_history") {
+        composable(Destinations.OrderHistory.route) {  // ✅ Usar Destinations
             val orderManager = remember { OrderManager(context) }
             OrderHistoryScreen(
                 navController = navController,
@@ -94,10 +100,20 @@ fun NavGraph(navController: NavHostController) {
         }
 
         // Client Profile
-        composable("profile") {
+        composable(Destinations.Profile.route) {  // ✅ Usar Destinations
             ProfileScreen(navController = navController)
         }
 
-        // Puedes agregar aquí las rutas del admin si es necesario
+        // Admin Screens (si los tienes implementados)
+        composable(Destinations.AdminMain.route) {
+            // Aquí va tu AdminMainScreen cuando lo implementes
+            // Por ahora podemos mostrar un placeholder
+            ClientMainScreen(navController = navController) // Temporal
+        }
+
+        composable(Destinations.AdminProducts.route) {
+            // Aquí va tu AdminProductsScreen cuando lo implementes
+            ClientMainScreen(navController = navController) // Temporal
+        }
     }
 }

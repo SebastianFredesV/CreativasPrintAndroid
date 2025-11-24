@@ -56,41 +56,31 @@ fun ClientMainScreen(navController: NavController) {
 
         Button(
             onClick = {
-                // Navegar al catálogo de productos pasando el cartManager
-                navController.navigate("product_list")
+                navController.navigate(Destinations.ProductList.route)  // ✅ Usar Destinations
             }
         ) {
             Text("Ver Catálogo")
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
         Button(
             onClick = {
-                // Navegar al carrito
-                navController.navigate("cart")
+                navController.navigate(Destinations.Cart.route)  // ✅ Usar Destinations
             }
         ) {
-            Text("Mi Carrito (${cartItemsCount})")
+            Text("Mi Carrito")
         }
-
-        Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = {
-                // Navegar al historial de pedidos
-                navController.navigate("order_history")
+                navController.navigate(Destinations.OrderHistory.route)  // ✅ Usar Destinations
             }
         ) {
             Text("Mis Pedidos")
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
         Button(
             onClick = {
-                // Navegar al perfil
-                navController.navigate("profile")
+                navController.navigate(Destinations.Profile.route)  // ✅ Usar Destinations
             }
         ) {
             Text("Mi Perfil")

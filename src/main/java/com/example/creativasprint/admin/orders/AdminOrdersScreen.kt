@@ -55,7 +55,7 @@ fun AdminOrdersScreen(navController: NavController) {
 
     val filteredOrders = orders.filter { order ->
         val matchesSearch = searchQuery.isEmpty() ||
-                order.customerName.contains(searchQuery, ignoreCase = true) ||
+                (order.customerName?.contains(searchQuery, ignoreCase = true) == true) || // ✅ Manejar null
                 order.id.contains(searchQuery, ignoreCase = true)
 
         val matchesStatus = when (filterStatus) {
@@ -209,7 +209,10 @@ fun AdminOrderCard(
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
-                    Text(order.createdAt, style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        order.createdAt ?: "Fecha no disponible", // ✅ Manejar null
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
 
                 Text(
@@ -227,34 +230,49 @@ fun AdminOrderCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Información del cliente
-            Text("Cliente: ${order.customerName}", style = MaterialTheme.typography.bodyMedium)
-            Text("Email: ${order.customerEmail}", style = MaterialTheme.typography.bodySmall)
-            Text("Teléfono: ${order.customerPhone}", style = MaterialTheme.typography.bodySmall)
+            // Información del cliente - ✅ Manejar nulls
+            Text(
+                "Cliente: ${order.customerName ?: "Cliente no disponible"}",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                "Email: ${order.customerEmail ?: "Email no disponible"}",
+                style = MaterialTheme.typography.bodySmall
+            )
+            Text(
+                "Teléfono: ${order.customerPhone ?: "Teléfono no disponible"}",
+                style = MaterialTheme.typography.bodySmall
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Dirección de envío
-            Text("Dirección: ${order.shippingAddress}", style = MaterialTheme.typography.bodySmall)
-            if (order.shippingNotes.isNotEmpty()) {
+            // Dirección de envío - ✅ Manejar null
+            Text(
+                "Dirección: ${order.shippingAddress ?: "Dirección no disponible"}",
+                style = MaterialTheme.typography.bodySmall
+            )
+            if (!order.shippingNotes.isNullOrEmpty()) { // ✅ Manejar null o vacío
                 Text("Notas: ${order.shippingNotes}", style = MaterialTheme.typography.bodySmall)
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Resumen de productos
+            // Resumen de productos - ✅ Manejar lista nula
             Text("Productos:", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-            order.items.take(2).forEach { item ->
+
+            val items = order.items ?: emptyList() // ✅ Si items es null, usar lista vacía
+            items.take(2).forEach { item ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("${item.productName} x${item.quantity}")
+                    Text("${item.productName ?: "Producto"} x${item.quantity}") // ✅ Manejar null
                     Text("$${String.format("%.0f", item.price * item.quantity)}")
                 }
             }
-            if (order.items.size > 2) {
-                Text("... y ${order.items.size - 2} productos más", style = MaterialTheme.typography.bodySmall)
+
+            if (items.size > 2) {
+                Text("... y ${items.size - 2} productos más", style = MaterialTheme.typography.bodySmall)
             }
 
             Spacer(modifier = Modifier.height(8.dp))

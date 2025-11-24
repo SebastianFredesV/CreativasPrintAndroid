@@ -34,7 +34,7 @@ class OrderManager(private val context: Context) {
         val orderItems = cartItems.map { cartItem ->
             OrderItem(
                 productId = cartItem.productId,
-                productName = cartItem.productName,
+                productName = cartItem.productName ?: "Producto sin nombre",
                 quantity = cartItem.quantity,
                 price = cartItem.productPrice
             )

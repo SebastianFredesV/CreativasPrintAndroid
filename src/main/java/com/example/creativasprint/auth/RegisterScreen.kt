@@ -84,7 +84,7 @@ fun RegisterScreen(navController: NavController) {
 
                 // Crear nuevo usuario (siempre como cliente)
                 val newUser = User(
-                    id = (existingUsers.size + 1).toString(),
+                    id = (existingUsers.size + 1).toInt(),
                     email = email,
                     name = name,
                     role = SessionManager.ROLE_CLIENT

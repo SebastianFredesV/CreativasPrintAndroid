@@ -64,4 +64,7 @@ interface ApiService {
         @Path("id") orderId: Int,
         @Body request: UpdateOrderStatusRequest
     ): Response<Order>
+
+    @GET("users/{id}")
+    suspend fun getUserById(@Path("id") userId: String): Response<User>
 }
