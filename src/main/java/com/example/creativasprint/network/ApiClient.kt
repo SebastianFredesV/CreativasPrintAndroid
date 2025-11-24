@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 
 object ApiClient {
 
-    // Tus URLs de Xano
+    // XANO base URLs
     private const val BASE_URL = "https://x8ki-letl-twmt.n7.xano.io/api:jgehxa2L/"
     private const val AUTH_BASE_URL = "https://x8ki-letl-twmt.n7.xano.io/api:jlcUx8g0/"
 
@@ -25,14 +25,14 @@ object ApiClient {
             .build()
     }
 
-    // Retrofit para la API principal
+    // API principal (products, orders, users NO auth)
     private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .client(getOkHttpClient())
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    // Retrofit para autenticación
+    // API de autenticación (login/register)
     private val authRetrofit: Retrofit = Retrofit.Builder()
         .baseUrl(AUTH_BASE_URL)
         .client(getOkHttpClient())

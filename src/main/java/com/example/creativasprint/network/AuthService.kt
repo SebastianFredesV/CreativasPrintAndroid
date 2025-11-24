@@ -1,18 +1,16 @@
 package com.example.creativasprint.network
 
-import com.example.creativasprint.model.User
 import com.example.creativasprint.network.requests.LoginRequest
 import com.example.creativasprint.network.requests.RegisterRequest
-import com.example.creativasprint.network.responses.AuthResponse
+import com.example.creativasprint.network.responses.XanoAuthResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface AuthService {
-
     @POST("auth/login")
-    suspend fun login(@Body request: LoginRequest): Response<AuthResponse>
+    suspend fun login(@Body request: LoginRequest): Response<XanoAuthResponse>
 
     @POST("auth/register")
-    suspend fun register(@Body request: RegisterRequest): Response<AuthResponse>
+    suspend fun register(@Body request: RegisterRequest): Response<XanoAuthResponse>
 }

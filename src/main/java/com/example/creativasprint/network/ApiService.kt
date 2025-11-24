@@ -21,7 +21,8 @@ interface ApiService {
     @POST("auth/register")
     suspend fun register(@Body request: RegisterRequest): Response<AuthResponse>
 
-    // ============ PRODUCT ENDPOINTS ============
+    // ============ PRODUCT ENDPOINTS (Xano) ============
+
     @GET("products")
     suspend fun getProducts(): Response<List<Product>>
 
@@ -32,12 +33,19 @@ interface ApiService {
     suspend fun createProduct(@Body product: Product): Response<Product>
 
     @PUT("products/{id}")
-    suspend fun updateProduct(@Path("id") productId: String, @Body product: Product): Response<Product>
+    suspend fun updateProduct(
+        @Path("id") productId: String,
+        @Body product: Product
+    ): Response<Product>
 
     @DELETE("products/{id}")
     suspend fun deleteProduct(@Path("id") productId: String): Response<ApiResponse>
 
-    // ============ USER ENDPOINTS (Admin only) ============
+
+    // ============ USER ENDPOINTS ============
+    @GET("users/{id}")
+    suspend fun getUserById(@Path("id") userId: String): Response<User>
+
     @GET("admin/users")
     suspend fun getUsers(): Response<List<User>>
 
@@ -47,6 +55,7 @@ interface ApiService {
     @PUT("admin/users/{id}/unblock")
     suspend fun unblockUser(@Path("id") userId: String): Response<User>
 
+
     // ============ ORDER ENDPOINTS ============
     @GET("orders")
     suspend fun getOrders(): Response<List<Order>>
@@ -54,7 +63,6 @@ interface ApiService {
     @POST("orders")
     suspend fun createOrder(@Body request: CreateOrderRequest): Response<Order>
 
-    // Admin orders
     @GET("admin/orders")
     suspend fun getAdminOrders(): Response<List<Order>>
 

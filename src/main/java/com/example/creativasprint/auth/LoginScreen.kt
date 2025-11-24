@@ -28,6 +28,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.creativasprint.destinations.Destinations
+import com.example.creativasprint.model.User
 import com.example.creativasprint.network.ApiClient
 import com.example.creativasprint.network.requests.LoginRequest
 import kotlinx.coroutines.CoroutineScope
@@ -157,11 +158,19 @@ private fun performRealLogin(
                 if (response.isSuccessful) {
                     val authResponse = response.body()
 
-                    if (authResponse?.success == true && authResponse.user != null) {
-                        // ✅ Login exitoso
-                        sessionManager.saveUserSession(authResponse.user, authResponse.token)
+                    if (authResponse != null) {
+                        // ✅ Login exitoso - Crear objeto User con los datos que tenemos
+                        val user = User(
+                            id = authResponse.userId.toString(),
+                            email = email,
+                            name = "Usuario", // Temporal - necesitaríamos obtener el nombre de otro endpoint
+                            role = "client", // Temporal - asumimos cliente por defecto
+                            isActive = true
+                        )
 
-                        val destination = if (authResponse.user.role == SessionManager.ROLE_ADMIN) {
+                        sessionManager.saveUserSession(user, authResponse.authToken)
+
+                        val destination = if (user.role == SessionManager.ROLE_ADMIN) {
                             Destinations.AdminMain.route
                         } else {
                             Destinations.ClientMain.route
@@ -171,13 +180,12 @@ private fun performRealLogin(
                             popUpTo(Destinations.Login.route) { inclusive = true }
                         }
                     } else {
-                        // ❌ Login fallido
-                        onError(authResponse?.message ?: "Credenciales incorrectas")
+                        onError("Error en la respuesta del servidor")
                     }
                 } else {
                     // ❌ Error de servidor
                     val errorMsg = when (response.code()) {
-                        401 -> "Credenciales incorrectas"
+                        401, 403 -> "Credenciales incorrectas"
                         404 -> "Usuario no encontrado"
                         500 -> "Error del servidor"
                         else -> "Error en el login: ${response.code()}"
@@ -188,15 +196,7 @@ private fun performRealLogin(
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
                 onLoading(false)
-                // ❌ Error de conexión - Manejamos específicamente el error de permisos
-                val errorMsg = when {
-                    e.message?.contains("Permission denied") == true ->
-                        "Error de permisos: La app no tiene acceso a internet"
-                    e.message?.contains("Unable to resolve host") == true ->
-                        "Error de conexión: No se puede conectar al servidor"
-                    else -> "Error de conexión: ${e.message}"
-                }
-                onError(errorMsg)
+                onError("Error de conexión: ${e.message}")
             }
         }
     }
